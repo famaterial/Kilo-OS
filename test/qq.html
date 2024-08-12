@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vicious Viper System Components</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        #tree-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        #config-container {
+            width: 80%;
+            margin-top: 20px;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+        }
+
+        .node {
+            cursor: pointer;
+        }
+
+        .node:hover circle {
+            stroke: orange;
+        }
+
+        .node circle {
+            fill: #fff;
+            stroke: steelblue;
+            stroke-width: 1.5px;
+        }
+
+        .node text {
+            font-size: 12px;
+            fill: #333;
+        }
+
+        .link {
+            fill: none;
+            stroke: #ccc;
+            stroke-width: 1.5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Vicious Viper System Components</h1>
+    <div id="tree-container"></div>
+    <div id="config-container">
+        <h2>Configuration File</h2>
+        <pre id="config-content">Click on a component to view its configuration file.</pre>
+    </div>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <script>
+        const treeData = {
+            name: "Vicious Viper",
+            children: [
+                {
+                    name: "System",
+                    children: [
+                        { name: "Kernel", children: [{ name: "Linux Kernel" }] },
+                        { name: "Init System", children: [{ name: "systemd" }] },
+                        { name: "Boot Loader", children: [{ name: "grub" }] },
+                        { name: "Package Manager", children: [{ name: "yay" }, { name: "pacman" }] }
+                    ]
+                },
+                {
+                    name: "Applications",
+                    children: [
+                        {
+                            name: "Display Server",
+                            children: [
+                                { name: "xsettingsd" },
+                                { name: "waybar" }
+                            ]
+                        },
+                        {
+                            name: "Window Manager",
+                            children: [
+                                { name: "hypr" }
+                            ]
+                        },
+                        {
+                            name: "Text Editors",
+                            children: [
+                                { name: "nvim" }
+                            ]
+                        },
+                        {
+                            name: "Media",
+                            children: [
+                                { name: "mpv" },
+                                { name: "cmus" },
+                                { name: "cava" }
+                            ]
+                        },
+                        {
+                            name: "Utilities",
+                            children: [
+                                { name: "Kvantum" },
+                                { name: "anyrun" },
+                                { name: "btop" },
+                                { name: "foot" },
+                                { name: "fsh" },
+                                { name: "mako" },
+                                { name: "qt5ct" },
+                                { name: "rofi" },
+                                { name: "yazi" },
+                                { name: "zathura" },
+                                { name: "zsh" }
+                            ]
+                        },
+                        {
+                            name: "GTK",
+                            children: [
+                                { name: "gtk-2.0" },
+                                { name: "gtk-3.0" },
+                                { name: "gtk-4.0" }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // Set the dimensions and margins of the diagram
+        const margin = { top: 20, right: 90, bottom: 30, left: 90 },
+            width = 960 - margin.left - margin.right,
+            height = 800 - margin.top - margin.bottom;
+
+        // Append the svg object to the body of the page
+        const svg = d3.select("#tree-container").append("svg")
+            .attr("width", width + margin.right + margin.left)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        // Creates a tree layout
+        const treemap = d3.tree().size([height, width]);
+
+        // Assigns parent, children, height, depth
+        let nodes = d3.hierarchy(treeData, d => d.children);
+
+        nodes = treemap(nodes);
+
+        // Adds the links between the nodes
+        const link = svg.selectAll(".link")
+            .data(nodes.descendants().slice(1))
+            .enter().append("path")
+            .attr("class", "link")
+            .attr("d", d => {
+                return "M" + d.y + "," + d.x
+                    + "C" + (d.y + d.parent.y) / 2 + "," + d.x
+                    + " " + (d.y + d.parent.y) / 2 + "," + d.parent.x
+                    + " " + d.parent.y + "," + d.parent.x;
+            });
+
+        // Adds each node as a group
+        const node = svg.selectAll(".node")
+            .data(nodes.descendants())
+            .enter().append("g")
+            .attr("class", "node")
+            .attr("transform", d => "translate(" + d.y + "," + d.x + ")");
+
+        // Adds the circle to the node
+        node.append("circle")
+            .attr("r", 10)
+            .on("click", (event, d) => {
+                d3.select("#config-content").text(`Configuration file for ${d.data.name}`);
+                // Here you would load the actual configuration file content
+            });
+
+        // Adds the text to the node
+        node.append("text")
+            .attr("dy", ".35em")
+            .attr("x", d => d.children ? -13 : 13)
+            .style("text-anchor", d => d.children ? "end" : "start")
+            .text(d => d.data.name);
+    </script>
+</body>
+</html>

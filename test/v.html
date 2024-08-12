@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Linux OS Tree</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+        
+        .tree {
+            white-space: nowrap;
+            overflow-x: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px 0;
+        }
+        
+        .tree ul {
+            list-style-type: none;
+            position: relative;
+            padding-left: 1em;
+        }
+        
+        .tree ul::before {
+            content: '';
+            border-left: 1px solid #ccc;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+        }
+        
+        .tree li {
+            margin: 0;
+            padding: 0.5em 0;
+            padding-left: 1em;
+            position: relative;
+        }
+        
+        .tree li::before {
+            content: '';
+            border-top: 1px solid #ccc;
+            position: absolute;
+            top: 1.25em;
+            left: 0;
+            width: 1em;
+        }
+        
+        .tree li span {
+            cursor: pointer;
+            padding: 0.5em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #e9e9e9;
+            display: inline-block;
+        }
+        
+        .tree li span:hover {
+            background-color: #d9d9d9;
+        }
+        
+        .config-content {
+            display: none;
+        }
+        
+        .config-display {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+            white-space: pre-wrap;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="tree">
+        <ul>
+            <li>
+                <span>OS Name</span>
+                <ul>
+                    <li>
+                        <span>WM / Compositor - labwc</span>
+                        <div class="config-content" id="labwc-config">
+                            /* .config content for labwc */
+                        </div>
+                    </li>
+                    <li>
+                        <span>Lockscreen - gtklock</span>
+                        <div class="config-content" id="gtklock-config">
+                            /* .config content for gtklock */
+                        </div>
+                    </li>
+                    <li>
+                        <span>Idle Control - swayidle</span>
+                        <div class="config-content" id="swayidle-config">
+                            /* .config content for swayidle */
+                        </div>
+                    </li>
+                    <li>
+                        <span>Bar - waybar</span>
+                        <div class="config-content" id="waybar-config">
+                            /* .config content for waybar */
+                        </div>
+                    </li>
+                    <li>
+                        <span>Wallpapers - swaybg</span>
+                        <div class="config-content" id="swaybg-config">
+                            /* .config content for swaybg */
+                        </div>
+                    </li>
+                    <li>
+                        <span>Notifications - dunst</span>
+                        <div class="config-content" id="dunst-config">
+                            /* .config content for dunst */
+                        </div>
+                    </li>
+                    <li>
+                        <span>App Launcher - nwg-drawer</span>
+                        <div class="config-content" id="nwg-drawer-config">
+                            /* .config content for nwg-drawer */
+                        </div>
+                    </li>
+                    <li>
+                        <span>Display Manager - ly</span>
+                        <div class="config-content" id="ly-config">
+                            /* .config content for ly */
+                        </div>
+                    </li>
+                    <li>
+                        <span>Power Menu - rofi</span>
+                        <div class="config-content" id="rofi-config">
+                            /* .config content for rofi */
+                        </div>
+                    </li>
+                    <li>
+                        <span>Terminal - kitty</span>
+                        <div class="config-content" id="kitty-config">
+                            /* .config content for kitty */
+                        </div>
+                    </li>
+                    <li>
+                        <span>MATE Applications</span>
+                        <ul>
+                            <li>
+                                <span>caja</span>
+                                <div class="config-content" id="caja-config">
+                                    /* .config content for caja */
+                                </div>
+                            </li>
+                            <li>
+                                <span>atril</span>
+                                <div class="config-content" id="atril-config">
+                                    /* .config content for atril */
+                                </div>
+                            </li>
+                            <li>
+                                <span>engrampa</span>
+                                <div class="config-content" id="engrampa-config">
+                                    /* .config content for engrampa */
+                                </div>
+                            </li>
+                            <li>
+                                <span>mate-system-monitor</span>
+                                <div class="config-content" id="mate-system-monitor-config">
+                                    /* .config content for mate-system-monitor */
+                                </div>
+                            </li>
+                            <li>
+                                <span>mate-polkit</span>
+                                <div class="config-content" id="mate-polkit-config">
+                                    /* .config content for mate-polkit */
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <span>Browser - Firefox</span>
+                        <div class="config-content" id="firefox-config">
+                            /* .config content for Firefox (css config here) */
+                        </div>
+                    </li>
+                    <li>
+                        <span>Spotify client - AUR</span>
+                        <div class="config-content" id="spotify-client-config">
+                            /* .config content for AUR client with Spicetify (theme included here) */
+                        </div>
+                    </li>
+                    <li>
+                        <span>Audio mixer - pavucontrol</span>
+                        <div class="config-content" id="pavucontrol-config">
+                            /* .config content for pavucontrol */
+                        </div>
+                    </li>
+                    <li>
+                        <span>Bluetooth manager - blueman</span>
+                        <div class="config-content" id="blueman-config">
+                            /* .config content for blueman */
+                        </div>
+                    </li>
+                    <li>
+                        <span>Fetching tool - fastfetch</span>
+                        <div class="config-content" id="fastfetch-config">
+                            /* .config content for fastfetch */
+                        </div>
+                    </li>
+                    <li>
+                        <span>Shell - fish</span>
+                        <div class="config-content" id="fish-config">
+                            /* .config content for fish */
+                        </div>
+                    </li>
+                    <li>
+                        <span>Pokemon sprites - pokemon-colorscripts</span>
+                        <div class="config-content" id="pokemon-colorscripts-config">
+                            /* .config content for pokemon-colorscripts */
+                        </div>
+                    </li>
+                    <li>
+                        <span>Display Manager - kanshi</span>
+                        <div class="config-content" id="kanshi-config">
+                            /* .config content for kanshi */
+                        </div>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+    <div class="config-display" id="config-display"></div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const treeItems = document.querySelectorAll('.tree li span');
+            const configDisplay = document.getElementById('config-display');
+
+            treeItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const configId = this.nextElementSibling.id;
+                    const configContent = document.getElementById(configId).textContent;
+                    configDisplay.textContent = configContent;
+                    configDisplay.style.display = 'block';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+

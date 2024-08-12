@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux OS Filter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .filter-container {
+            width: 300px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .filter-header h2 {
+            font-size: 18px;
+            margin: 0;
+        }
+        .filter-header button {
+            background: none;
+            border: none;
+            color: #007bff;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .filter-section {
+            margin-bottom: 20px;
+        }
+        .filter-section h3 {
+            font-size: 16px;
+            margin: 0 0 10px;
+        }
+        .filter-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .filter-section li {
+            margin-bottom: 10px;
+        }
+        .filter-section input[type="checkbox"] {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="filter-container">
+        <div class="filter-header">
+            <h2>Filter Results</h2>
+            <button onclick="toggleFilter()">Hide</button>
+        </div>
+        <div class="filter-section">
+            <h3>Kernel</h3>
+            <ul>
+                <li><label><input type="checkbox"> linux</label></li>
+                <li><label><input type="checkbox"> linux-lts</label></li>
+                <li><label><input type="checkbox"> linux-hardened</label></li>
+                <li><label><input type="checkbox"> linux-zen</label></li>
+            </ul>
+        </div>
+        <div class="filter-section">
+            <h3>Display Server</h3>
+            <ul>
+                <li><label><input type="checkbox"> X11</label></li>
+                <li><label><input type="checkbox"> Wayland</label></li>
+            </ul>
+        </div>
+        <div class="filter-section">
+            <h3>Distribution</h3>
+            <ul>
+                <li><label><input type="checkbox"> Linux Mint</label></li>
+                <li><label><input type="checkbox"> Ubuntu</label></li>
+                <li><label><input type="checkbox"> Fedora</label></li>
+                <li><label><input type="checkbox"> Debian</label></li>
+                <li><label><input type="checkbox"> openSUSE</label></li>
+                <li><label><input type="checkbox"> Arch Linux</label></li>
+                <li><label><input type="checkbox"> elementary OS</label></li>
+                <li><label><input type="checkbox"> Red Hat Enterprise Linux</label></li>
+                <li><label><input type="checkbox"> Manjaro</label></li>
+                <li><label><input type="checkbox"> Gentoo</label></li>
+                <li><label><input type="checkbox"> Void</label></li>
+                <li><label><input type="checkbox"> NixOS</label></li>
+                <li><label><input type="checkbox"> EndeavourOS</label></li>
+                <li><label><input type="checkbox"> Pop!_OS</label></li>
+                <li><label><input type="checkbox"> FreeBSD</label></li>
+                <li><label><input type="checkbox"> LFS</label></li>
+            </ul>
+        </div>
+        <div class="filter-section">
+            <h3>Desktop Environment</h3>
+            <ul>
+                <li><label><input type="checkbox"> MATE</label></li>
+                <li><label><input type="checkbox"> Xfce</label></li>
+                <li><label><input type="checkbox"> Cinnamon</label></li>
+                <li><label><input type="checkbox"> GNOME</label></li>
+                <li><label><input type="checkbox"> LXQt</label></li>
+                <li><label><input type="checkbox"> KDE Plasma</label></li>
+                <li><label><input type="checkbox"> LXDE</label></li>
+                <li><label><input type="checkbox"> Budgie</label></li>
+                <li><label><input type="checkbox"> Deepin</label></li>
+            </ul>
+        </div>
+        <div class="filter-section">
+            <h3>Window Manager</h3>
+            <ul>
+                <li><label><input type="checkbox"> Awesome</label></li>
+                <li><label><input type="checkbox"> Hyprland</label></li>
+                <li><label><input type="checkbox"> Xmonad</label></li>
+                <li><label><input type="checkbox"> Herbstluftwm</label></li>
+                <li><label><input type="checkbox"> IceWM</label></li>
+                <li><label><input type="checkbox"> Bspwm</label></li>
+                <li><label><input type="checkbox"> I3</label></li>
+                <li><label><input type="checkbox"> Dwm</label></li>
+                <li><label><input type="checkbox"> sway</label></li>
+            </ul>
+        </div>
+    </div>
+    <script>
+        function toggleFilter() {
+            const filterContainer = document.querySelector('.filter-container');
+            const button = document.querySelector('.filter-header button');
+            if (filterContainer.style.display === 'none') {
+                filterContainer.style.display = 'block';
+                button.textContent = 'Hide';
+            } else {
+                filterContainer.style.display = 'none';
+                button.textContent = 'Show';
+            }
+        }
+    </script>
+</body>
+</html>
+

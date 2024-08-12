@@ -1,0 +1,83 @@
+#!/bin/bash
+
+# Define NAMEOFSYSTEM variable earlier in your script
+NAMEOFSYSTEM="Bob"
+
+# Define CONFIG_LOCATIONS variable earlier in your script
+CONFIG_LOCATIONS="/home/ian/jjj/ /home/ian/guro/ /home/ian/my-proj/"
+
+# Function to create a GitHub repository and push code
+function create_and_push_repo {
+    # Check if GitHub CLI (gh) is installed
+    if ! command -v gh &> /dev/null; then
+        echo "GitHub CLI (gh) is not installed. Please install it first."
+        exit 1
+    fi
+
+    # Prompt for repository visibility with numbered options
+    echo "Choose the visibility of the repository:"
+    select visibility in "public" "private"; do
+        case $visibility in
+            "public")
+                visibility="public"
+                break
+                ;;
+            "private")
+                visibility="private"
+                break
+                ;;
+            *)
+                echo "Invalid option. Please select 1 or 2."
+                ;;
+        esac
+    done
+
+    # Create a temporary directory to consolidate files
+    temp_dir=$(mktemp -d)
+    echo "Temporary directory created: $temp_dir"
+
+    # Copy all files from CONFIG_LOCATIONS to the temporary directory
+    for LOCATION in $CONFIG_LOCATIONS; do
+        cp -r "$LOCATION"/* "$temp_dir/"
+    done
+
+    # Navigate to the temporary directory
+    cd "$temp_dir" || exit
+
+    # Initialize a new git repository
+    git init
+
+    # Add all files to the staging area
+    git add .
+
+    # Commit the changes
+    git commit -m "Initial commit"
+
+    # Create a GitHub repository and get the URL
+    repo_url=$(gh repo create "$NAMEOFSYSTEM" --"$visibility" --source=. --remote=origin | grep 'https://' | tr -d '\n')
+
+    # Verify the repository URL
+    if [[ ! "$repo_url" =~ ^https:// ]]; then
+        echo "Failed to create GitHub repository. Please check the repository name and visibility."
+        exit 1
+    fi
+
+    # Set the remote origin to the new repository URL
+    git remote add origin "$repo_url"
+
+    # Set the branch name to main (if it's not already)
+    git branch -M main
+
+    # Push the code to the remote repository
+    git push -u origin main
+
+    echo "Repository created and code pushed successfully."
+
+    # Clean up temporary directory
+    rm -rf "$temp_dir"
+    echo "Temporary directory deleted: $temp_dir"
+}
+
+# Call the function to create and push a GitHub repository
+create_and_push_repo
+

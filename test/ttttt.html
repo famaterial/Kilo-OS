@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Linux OS Breakdown</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container-tree {
+            width: 90%;
+            height: 90%;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin: 20px;
+        }
+
+        .tree {
+            flex: 1;
+            width: 100%;
+            overflow: auto;
+            position: relative;
+        }
+
+        .tree ul {
+            padding-top: 20px;
+            position: relative;
+            transition: all 0.5s;
+        }
+
+        .tree li {
+            float: left;
+            text-align: center;
+            list-style-type: none;
+            position: relative;
+            padding: 20px 5px 0 5px;
+            transition: all 0.5s;
+        }
+
+        .tree li::before, .tree li::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 50%;
+            border-top: 1px solid #ccc;
+            width: 50%;
+            height: 20px;
+        }
+
+        .tree li::after {
+            right: auto;
+            left: 50%;
+            border-left: 1px solid #ccc;
+        }
+
+        .tree li:only-child::after, .tree li:only-child::before {
+            display: none;
+        }
+
+        .tree li:only-child {
+            padding-top: 0;
+        }
+
+        .tree li:first-child::before, .tree li:last-child::after {
+            border: 0 none;
+        }
+
+        .tree li:last-child::before {
+            border-right: 1px solid #ccc;
+            border-radius: 0 5px 0 0;
+        }
+
+        .tree li:first-child::after {
+            border-radius: 5px 0 0 0;
+        }
+
+        .tree ul ul::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            border-left: 1px solid #ccc;
+            width: 0;
+            height: 20px;
+        }
+
+        .tree li a {
+            border: 1px solid #ccc;
+            padding: 5px 10px;
+            text-decoration: none;
+            color: #666;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            display: inline-block;
+            border-radius: 5px;
+            transition: all 0.5s;
+        }
+
+        .tree li a:hover, .tree li a:hover+ul li a {
+            background: #cce5ff;
+            color: #000;
+            border: 1px solid #94a0b4;
+        }
+
+        .tree li a:hover+ul li::after, 
+        .tree li a:hover+ul li::before, 
+        .tree li a:hover+ul::before, 
+        .tree li a:hover+ul ul::before {
+            border-color: #94a0b4;
+        }
+
+        .config-display {
+            width: 80%;
+            margin: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .config-display pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+    <script>
+        function showConfig(component) {
+            const configDisplay = document.getElementById('config-display');
+            const configContent = {
+                'Kernel': 'Linux 5.10 configuration content...',
+                'Init System': 'Systemd configuration content...',
+                'Display Server': 'Wayland configuration content...',
+                'Window Manager': 'Hypr configuration content...',
+                'Audio & Video': 'Audio & Video configuration content...',
+                'Terminal & Shell': 'Terminal & Shell configuration content...',
+                'Utilities': 'Utilities configuration content...',
+                'Package Management': 'Package Management configuration content...',
+                'Text Editors': 'Text Editors configuration content...',
+                'Graphics & Themes': 'Graphics & Themes configuration content...',
+                'Other Applications': 'Other Applications configuration content...',
+                'Kvantum': 'Kvantum config file content...',
+                'anyrun': 'anyrun config file content...',
+                'btop': 'btop config file content...',
+                'cava': 'cava config file content...',
+                'cmus': 'cmus config file content...',
+                'foot': 'foot config file content...',
+                'fsh': 'fsh config file content...',
+                'gtk-2.0': 'gtk-2.0 config file content...',
+                'gtk-3.0': 'gtk-3.0 config file content...',
+                'gtk-4.0': 'gtk-4.0 config file content...',
+                'hypr': 'hypr config file content...',
+                'mako': 'mako config file content...',
+                'mpv': 'mpv config file content...',
+                'nvim': 'nvim config file content...',
+                'qt5ct': 'qt5ct config file content...',
+                'rofi': 'rofi config file content...',
+                'waybar': 'waybar config file content...',
+                'xsettingsd': 'xsettingsd config file content...',
+                'yay': 'yay config file content...',
+                'yazi': 'yazi config file content...',
+                'zathura': 'zathura config file content...',
+                'zsh': 'zsh config file content...',
+            };
+            configDisplay.innerHTML = `<h2>${component} Configuration</h2><pre>${configContent[component]}</pre>`;
+            configDisplay.style.display = 'block';
+        }
+    </script>
+</head>
+<body>
+    <div class="container-tree">
+        <div class="header">
+            <h1>Custom Linux OS Breakdown</h1>
+            <p>Explore the components and configuration of this custom Linux system.</p>
+        </div>
+        <div class="tree">
+            <ul>
+                <li>
+                    <a href="javascript:void(0)" onclick="showConfig('Kernel')">Kernel: Linux 5.10</a>
+                    <ul>
+                        <li>
+                            <a href="javascript:void(0)" onclick="showConfig('Init System')">Init System: Systemd</a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)" onclick="showConfig('Display Server')">Display Server: Wayland</a>
+                            <ul>
+                                <li>
+                                    <a href="javascript:void(0)" onclick="showConfig('Window Manager')">Window Manager: Hypr</a>
+                                    <ul>
+                                        <li><a href="javascript:void(0)" onclick="showConfig('waybar')">Waybar</a></li>
+                                        <li><a href="javascript:void(0)" onclick="showConfig('mako')">Mako</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)" onclick="showConfig('Audio & Video')">Audio & Video</a>
+                            <ul>
+                                <li><a href="javascript:void(0)" onclick="showConfig('cava')">Cava</a></li>
+                                <li><a href="javascript:void(0)" onclick="showConfig('cmus')">Cmus</a></li>
+                                <li><a href="javascript:void(0)" onclick="showConfig('mpv')">MPV</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)" onclick="showConfig('Terminal & Shell')">Terminal & Shell</a>
+                            <ul>
+                                <li><a href="javascript:void(0)" onclick="showConfig('foot')">Foot</a></li>
+                                <li><a href="javascript:void(0)" onclick="showConfig('fsh')">FSH</a></li>
+                                <li><a href="javascript:void(0)" onclick="showConfig('zsh')">Zsh</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)" onclick="showConfig('Utilities')">Utilities</a>
+                            <ul>
+                                <li><a href="javascript:void(0)" onclick="showConfig('btop')">Btop</a></li>
+                                <li><a href="javascript:void(0)" onclick="showConfig('rofi')">Rofi</a></li>
+                                <li><a href="javascript:void(0)" onclick="showConfig('xsettingsd')">Xsettingsd</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)" onclick="showConfig('Package Management')">Package Management</a>
+                            <ul>
+                                <li><a href="javascript:void(0)" onclick="showConfig('yay')">Yay</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)" onclick="showConfig('Text Editors')">Text Editors</a>
+                            <ul>
+                                <li><a href="javascript:void(0)" onclick="showConfig('nvim')">Nvim</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)" onclick="showConfig('Graphics & Themes')">Graphics & Themes</a>
+                            <ul>
+                                <li><a href="javascript:void(0)" onclick="showConfig('Kvantum')">Kvantum</a></li>
+                                <li><a href="javascript:void(0)" onclick="showConfig('gtk-2.0')">GTK 2.0</a></li>
+                                <li><a href="javascript:void(0)" onclick="showConfig('gtk-3.0')">GTK 3.0</a></li>
+                                <li><a href="javascript:void(0)" onclick="showConfig('gtk-4.0')">GTK 4.0</a></li>
+                                <li><a href="javascript:void(0)" onclick="showConfig('qt5ct')">Qt5ct</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)" onclick="showConfig('Other Applications')">Other Applications</a>
+                            <ul>
+                                <li><a href="javascript:void(0)" onclick="showConfig('anyrun')">Anyrun</a></li>
+                                <li><a href="javascript:void(0)" onclick="showConfig('yazi')">Yazi</a></li>
+                                <li><a href="javascript:void(0)" onclick="showConfig('zathura')">Zathura</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <div id="config-display" class="config-display"></div>
+    </div>
+</body>
+</html>
+

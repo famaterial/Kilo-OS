@@ -1,0 +1,400 @@
+#!/bin/bash
+
+# Function to handle login
+function login { 
+  echo "mucator.net"
+  echo
+  read -p "Username: " username
+  read -sp "Password: " password
+  echo
+  sleep 1s
+  echo
+  read -p "Would you like to generate a public/private RSA key pair for this device and account? (Y/n): " generate_rsa
+  
+  if [[ $generate_rsa =~ ^[Yy]$ || -z $generate_rsa ]]; then
+    echo "Generating RSA key pair..."
+    # Add your RSA key generation logic here
+    sleep 1s
+    echo "RSA key pair generated."
+  fi
+
+  sleep 1s
+  echo
+  echo "Login Successful."
+  echo "Welcome, $username."
+  echo
+  mucator
+}
+
+# Function to get system information
+function get_system_info {
+  echo
+  uname -a
+  echo
+  sleep 3s
+  pstree
+  echo
+}
+
+# Function to prompt for user confirmation
+function confirm {
+  local prompt_message="$1"
+  local confirm_var
+  
+  read -p "$prompt_message (Y/n): " confirm_var
+  echo
+  
+  if [[ $confirm_var =~ ^[Nn]$ ]]; then
+    echo "Please exit and login with the desired profile."
+    exit 1
+  fi
+}
+
+# Function to list files and prompt for removal
+function list_and_remove_files {
+  local dir_path="$1"
+  local files=$(find "$dir_path" -maxdepth 1 -exec basename {} \;)
+
+  while true; do
+    echo
+    echo "Listing files in $dir_path:"
+    echo
+
+    echo "$files" | nl | pr -t3 -w100
+    echo
+
+    read -p "Enter a number to remove a file from this directory (leave blank / press enter to continue): " file_number
+
+    if [[ -z $file_number ]]; then
+      break
+    fi
+
+    file_to_remove=$(echo "$files" | sed "${file_number}q;d")
+    files=$(echo "$files" | grep -v "^$file_to_remove$")
+  done
+}
+
+# Function to add additional packages
+function add_additional_packages {
+  local package_list=("$@")
+  local package_name
+
+  while true; do
+    read -p "Enter a package name to add (or leave blank to continue): " package_name
+
+    if [[ -z $package_name ]]; then
+      break
+    fi
+
+    if pacman -Ss "^$package_name\$" &> /dev/null; then
+      package_list+=("$package_name")
+      echo
+      echo "Package '$package_name' added."
+      echo
+    else
+      echo
+      echo "Package '$package_name' not found in repositories."
+    fi
+  done
+
+  echo "sudo pacman -S ${package_list[@]}" > install.sh
+  
+  chmod +x install.sh
+}
+
+# Function to list installed fonts and allow removal from list
+function list_and_remove_fonts {
+  local font_list=$(fc-list | cut -d ':' -f 2 | cut -d ',' -f 1 | sort -u)
+  local font_to_remove
+
+  while true; do
+    echo
+    echo "Listing installed fonts:"
+    echo
+
+    echo "$font_list" | nl | pr -t3 -w100
+    echo
+
+    read -p "Enter a number to remove a font from this list (leave blank / press enter to continue): " font_number
+
+    if [[ -z $font_number ]]; then
+      break
+    fi
+
+    font_to_remove=$(echo "$font_list" | sed "${font_number}q;d")
+    font_list=$(echo "$font_list" | grep -v "^$font_to_remove$")
+  done
+}
+
+# Function to upload to GitHub repository
+function upload_to_github {
+
+    # Log in to GitHub using gh auth login
+    gh auth login
+
+    # Ask for the name of the operating system
+    read -p "Enter the name of the operating system: " NAMEOFSYSTEM
+
+    # Create a new GitHub repository using the NAMEOFSYSTEM as the repository name
+    REPO_URL=$(gh repo create "$NAMEOFSYSTEM" --private | grep -o 'https://github.com.*')
+    echo "Created repository: $REPO_URL"
+
+    # Iterate over each configuration location
+    for LOCATION in $CONFIG_LOCATIONS; do
+        # Navigate to the configuration location
+        cd $LOCATION
+
+        # Initialize Git if not already initialized
+        if [ ! -d ".git" ]; then
+            git init
+        fi
+
+        # Add all files to the staging area
+        git add .
+
+        # Commit changes with a message
+        git commit -m "Uploaded via Mucator"
+
+        # Set remote origin based on dynamically retrieved repository URL
+        git remote remove origin >/dev/null 2>&1  # Remove existing origin (if any)
+        git remote add origin $REPO_URL
+        git push -u origin main
+
+        # Navigate back to the original directory
+        cd -
+    done
+
+    echo "Process completed successfully!"
+}
+
+# Welcome message and main menu
+printf "Welcome to Mucator."
+sleep .7s
+echo
+echo
+echo "What would you like to do?"
+echo
+echo "1. System Clone         3. System Install"
+echo "2. System Diagnostic    4. Login"
+echo
+read -p "(press h for help or q to quit): " choice
+
+if [[ $choice == "q" ]]; then
+   exit 0
+elif [[ $choice == "h" ]]; then
+  echo
+  echo "Help:"
+  echo
+  echo "1: System Clone"
+  echo
+  echo "System Clone partners with you to replicate your current desktop setup effortlessly. System Clone ensures precise system configuration replication by generating tailored installation scripts for essential packages and configurations. You guide the process, selecting crucial components and omitting non-essential ones. System Clone prioritizes privacy, excluding personal information and unwanted file duplications from the cloning process."
+  echo
+  echo "2: System Diagnostic"
+  echo
+  echo "System Diagnostic provides a comprehensive scan of your system, securely delivering all desired information quickly and conveniently in one place. Accessible by the root user, it conducts safe, secure, and lightweight tests to collect accurate and informative system data. This ensures your system operates optimally with reliable performance."
+  echo
+  echo "3: System Install"
+  echo
+  echo "System Install streamlines the installation process of a custom desktop with exceptional ease and efficiency. This automated process meticulously installs essential packages and configuration files, ensuring precise replication of a system setup. It's designed for new installations or creating new user accounts, seamlessly placing all necessary components in their correct locations for a hassle-free setup experience.
+
+Disclaimer: System Install is intended for new installations or new user accounts. As it effectively installs an entire new system setup, it may significantly alter existing configurations. Please proceed with caution to avoid unintended changes to your current setup."
+  echo
+  echo "4: Login to Mucator"
+  echo
+  echo "Securely log into the mucator.net servers."
+  echo
+  exit 0
+elif [[ $choice -eq 1 ]]; then
+  current_user=$(whoami)
+  echo
+  read -p "Clone current profile: $current_user (Y/n): " confirm_clone
+
+  if [[ $confirm_clone =~ ^[Nn]$ ]]; then
+    echo "Please exit and login with the desired profile."
+    exit 1
+  fi
+
+  echo
+  echo "Welcome to System Clone by Mucator."
+  echo
+  echo "-----------------------------------"
+  echo
+  sleep 1s
+  echo "Let's get the clone started by collecting some basic system information."
+  sleep 1s
+
+  get_system_info
+  echo "These processes serve as a foundation for your system, and lesser important installation details."
+  echo
+  echo "Please start or stop any processes necessary for system functionality." 
+  echo "Some processes may be ignored for certain systems."
+  echo
+  confirm "Are the processes above correct?"
+
+  # Check if the system is Arch-based
+  if ! grep -qi 'arch' /etc/os-release; then
+    echo "This script only supports Arch-based systems."
+    exit 1
+  fi
+
+  # Check if pacman is available
+  if ! command -v pacman &> /dev/null; then
+    echo "Pacman package manager not found."
+    exit 1
+  fi
+
+  # Retrieve a list of user-installed packages
+  read -p "Operating System Name: " NAMEOFSYSTEM
+  echo
+  echo "Name saved successfully."
+  sleep 1.2s
+  echo
+  echo "Let's start with choosing what programs will install with this system."
+  sleep 3s
+  echo
+  echo "Here is a list of programs that are currently installed on this system:"
+  sleep 3s
+
+  installed_packages=$(comm -23 <(pacman -Qqett | sort) <(pacman -Qqg base base-devel | sort))
+
+  while true; do
+    echo
+    echo "Here are the user-installed packages we found:"
+    echo "The following packages will be installed as part of the clone:"
+    echo
+    echo "$installed_packages" | nl | pr -t3 -w100
+    echo
+    read -p "Enter a number to remove a package from this clone (leave blank / press enter to continue): " package_number
+
+    if [[ -z $package_number ]]; then
+      break
+    fi
+
+    package_to_remove=$(echo "$installed_packages" | sed "${package_number}q;d")
+    installed_packages=$(echo "$installed_packages" | grep -v "^$package_to_remove$")
+  done
+
+  echo
+  echo "Packages ready to install."
+  echo
+
+  additional_packages=()
+  add_additional_packages "${additional_packages[@]}"
+
+  echo
+  echo "Packages saved."
+  echo
+
+  # Collect font information
+  echo
+  echo "Next, let's move on to fonts."
+  sleep 1s
+  echo
+
+  list_and_remove_fonts
+
+  echo
+  echo "Fonts ready to install."
+  echo
+  sleep 1s
+
+  echo "Do you want to add a custom shell configuration to the clone?"
+  echo
+  read -p "(Y/n): " custom_shell_config
+
+  if [[ $custom_shell_config =~ ^[Yy]$ || -z $custom_shell_config ]]; then
+    echo
+    echo "Enter the commands for your custom shell configuration:"
+    echo "(Enter an empty line to finish)"
+    echo
+
+    custom_shell_commands=()
+    while IFS= read -r line; do
+      [[ -z $line ]] && break
+      custom_shell_commands+=("$line")
+    done
+
+    echo
+    echo "Custom shell configuration saved."
+    echo
+    sleep 1s
+  fi
+
+  echo
+  echo "Please list any files or directories you'd like to exclude from the clone."
+  echo "(Enter an empty line to finish)"
+  echo
+
+  exclude_paths=()
+  while IFS= read -r path; do
+    [[ -z $path ]] && break
+    exclude_paths+=("$path")
+  done
+
+  echo
+  echo "Files and directories to exclude:"
+  for path in "${exclude_paths[@]}"; do
+    echo "$path"
+  done
+  echo
+
+  echo "Please confirm to continue:"
+  echo
+  echo "Packages to install:"
+  echo "$installed_packages"
+  echo
+  echo "Fonts to install:"
+  echo "$font_list"
+  echo
+  echo "Custom shell configuration:"
+  for command in "${custom_shell_commands[@]}"; do
+    echo "$command"
+  done
+  echo
+  echo "Files and directories to exclude:"
+  for path in "${exclude_paths[@]}"; do
+    echo "$path"
+  done
+  echo
+
+  confirm "Is everything correct?"
+
+  # Save configuration
+  mkdir -p "$NAMEOFSYSTEM"
+  echo "$installed_packages" > "$NAMEOFSYSTEM/packages.txt"
+  echo "$font_list" > "$NAMEOFSYSTEM/fonts.txt"
+  printf "%s\n" "${custom_shell_commands[@]}" > "$NAMEOFSYSTEM/custom_shell_config.sh"
+  printf "%s\n" "${exclude_paths[@]}" > "$NAMEOFSYSTEM/exclude.txt"
+
+  # Package the configuration into a tar.gz file
+  tar -czvf "$NAMEOFSYSTEM.tar.gz" "$NAMEOFSYSTEM"
+
+  echo
+  echo "System clone completed and saved to $NAMEOFSYSTEM.tar.gz."
+  echo
+  echo "Starting upload process..."
+  echo
+
+  CONFIG_LOCATIONS=$(find ~ -maxdepth 1 -type d | tr '\n' ' ')
+  upload_to_github
+
+elif [[ $choice -eq 2 ]]; then
+  echo "Starting System Diagnostic..."
+  sleep 1s
+  echo
+  get_system_info
+
+elif [[ $choice -eq 3 ]]; then
+  echo "Starting System Install..."
+  sleep 1s
+  echo
+  echo "This feature is under development. Please check back later."
+
+elif [[ $choice -eq 4 ]]; then
+  echo
+  login
+
+else
+  echo "Invalid choice. Please try again."
+fi
+

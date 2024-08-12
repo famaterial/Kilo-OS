@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Log in to GitHub using gh auth login
+gh auth login
+
+# Ask for the name of the operating system
+read -p "Enter the name of the operating system: " NAMEOFSYSTEM
+
+# Create a new GitHub repository using the NAMEOFSYSTEM as the repository name
+REPO_URL=$(gh repo create $NAMEOFSYSTEM --public | grep -o 'https://github.com.*')
+echo "Created repository: $REPO_URL"
+
+# Ask for configuration file locations
+read -p "Enter configuration file locations (separated by spaces): " CONFIG_LOCATIONS
+
+# Iterate over each configuration location
+for LOCATION in $CONFIG_LOCATIONS; do
+    # Navigate to the configuration location
+    cd $LOCATION
+
+    # Initialize Git if not already initialized
+    if [ ! -d ".git" ]; then
+        git init
+    fi
+
+    # Add all files to the staging area
+    git add .
+
+    # Commit changes with a message
+    git commit -m "Initial commit"
+
+    # Set remote origin based on dynamically retrieved repository URL
+    git remote remove origin >/dev/null 2>&1  # Remove existing origin (if any)
+    git remote add origin $REPO_URL
+    git push -u origin main
+
+    # Navigate back to the original directory
+    cd -
+done
+
+echo "Process completed successfully!"
